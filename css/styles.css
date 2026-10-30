@@ -461,20 +461,64 @@ h3 {
 .datos--ficha > div:last-child { border-bottom: 0; }
 
 /* ───────── Pie ───────── */
-.pie { border-top: 2px solid var(--tinta); background: var(--papel-2); }
+.pie {
+  background: var(--tinta);
+  color: var(--papel);
+  border-top: 4px solid var(--laton);
+}
+.pie a { color: inherit; text-underline-offset: .2em; }
+.pie a:hover { color: var(--laton); }
+.pie :focus-visible { outline-color: var(--laton); }
+.pie__grilla {
+  display: grid;
+  gap: 2rem;
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+}
+.pie__nombre {
+  margin: 0 0 .5rem;
+  font-family: var(--f-titulo);
+  font-weight: 600;
+  font-size: 1.5rem;
+  line-height: 1.15;
+}
+.pie__texto { margin: 0 0 1.1rem; max-width: 26rem; }
+.pie__titulo {
+  margin: 0 0 .9rem;
+  color: var(--laton);
+  font-weight: 500;
+}
+.pie__lista { list-style: none; margin: 0; padding: 0; display: grid; gap: .55rem; }
+.pie__lista--iconos li { display: flex; align-items: flex-start; gap: .7rem; }
+.pie__lista--iconos .ico { margin-top: .2em; color: var(--laton); }
+.pie .etiqueta { color: var(--laton); }
+.pie__aviso { margin-top: .7rem; }
+
+.redes { list-style: none; margin: 0; padding: 0; display: flex; gap: .75rem; }
+.redes a {
+  display: grid;
+  place-items: center;
+  width: 2.9rem;
+  height: 2.9rem;
+  border: 2px solid var(--papel);
+  border-radius: 3px;
+  transition: background-color .15s, color .15s, border-color .15s;
+}
+.redes a:hover { background: var(--laton); border-color: var(--laton); color: var(--tinta); }
+.redes .ico { width: 1.6rem; height: 1.6rem; }
+
+.pie__base { border-top: 1px solid rgba(239, 230, 210, .3); }
 .pie__fila {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  align-items: center;
-  gap: .5rem 2rem;
-  padding-block: 1.25rem;
+  gap: .4rem 2rem;
+  padding-block: 1rem;
 }
-.pie__nombre { margin: 0; font-family: var(--f-titulo); font-weight: 600; }
-.pie a { text-underline-offset: .2em; }
+.pie__derechos { margin: 0; font-size: .95rem; }
 
 /* ───────── Escritorio ───────── */
 @media (min-width: 62rem) {
+  .pie__grilla { grid-template-columns: minmax(0, 6fr) minmax(0, 3fr) minmax(0, 4fr); gap: 3rem; }
   .contacto__grilla { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 3rem; }
   .taller__grilla { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 3rem; }
   .galeria__grilla { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.75rem; }
