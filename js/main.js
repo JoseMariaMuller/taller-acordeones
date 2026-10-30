@@ -140,7 +140,9 @@ if (cabecera) {
       // Recorre los tres servicios (fuelle, afinación y estuche) y se repite con una pausa en el medio.
       // Como se mueve sola por más de 5 s, lleva un botón para pausarla (WCAG 2.2.2).
       // Se detiene sola si el dibujo sale de pantalla o si cambiás de pestaña.
-      const modos = ['fuelle', 'afinacion', 'estuche'];
+      // Cada etapa con su duración en ms. La aguja del afinador no sigue este ritmo: tiene su propio ciclo
+      // (ver agujaCss en tools/acordeon/build.mjs) y se mueve mientras el SVG lleve data-aguja.
+      const modos = [['fuelle', 1300], ['afinacion', 1300], ['estuche', 1300]];
       let corriendo = false;
       let pausadaPorLaPersona = false;
       let enPantalla = true;
@@ -151,23 +153,27 @@ if (cabecera) {
       const detener = () => {
         clearTimeout(temporizador);
         delete svg.dataset.mode;
+        delete svg.dataset.aguja;
         corriendo = false;
       };
 
       const recorrer = (repetir) => {
         if (corriendo || reducido.matches) return;
         corriendo = true;
+        svg.dataset.aguja = '';
         let indice = 0;
         const siguiente = () => {
           if (indice < modos.length) {
-            svg.dataset.mode = modos[indice++];
-            temporizador = setTimeout(siguiente, 1300);
+            const [modo, duracion] = modos[indice++];
+            svg.dataset.mode = modo;
+            temporizador = setTimeout(siguiente, duracion);
             return;
           }
           delete svg.dataset.mode;
           temporizador = setTimeout(() => {
             corriendo = false;
             if (puedeCorrer()) recorrer(true);
+            else delete svg.dataset.aguja;
           }, repetir ? 3500 : 900);
         };
         siguiente();
