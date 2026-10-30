@@ -11,6 +11,21 @@
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="i-whatsapp" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M24 5a18 18 0 1 1-8.6 33.8L6 42l3.3-9.1A18 18 0 0 1 24 5z"/>
+      <path d="M17.5 15.5c-1.2.9-1.8 2.6-1.3 4.7.9 4 5 8.6 9.6 10.4 2.2.9 3.8.2 4.8-1l1-1.5c.3-.5.2-1.1-.3-1.4l-3.3-2c-.5-.3-1.1-.2-1.4.2l-1 1.2c-2.5-1-4.9-3.4-5.9-5.9l1.2-1c.4-.3.5-.9.2-1.4l-1.8-3.3c-.3-.5-.9-.7-1.5-.5z" fill="currentColor" stroke="none"/>
+    </symbol>
+    <symbol id="i-ubicacion" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M24 43S11 31.5 11 21.5a13 13 0 0 1 26 0C37 31.5 24 43 24 43z"/>
+      <circle cx="24" cy="21.5" r="5"/>
+    </symbol>
+    <symbol id="i-reloj" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="24" cy="24" r="18"/>
+      <path d="M24 12.5V24l7.5 4.5"/>
+    </symbol>
+  </svg>
+
   <a class="salto" href="#inicio">Ir al contenido</a>
 
   <header class="cabecera">
@@ -43,7 +58,7 @@
           <h1 id="portada-titulo">Tu acordeón, de vuelta en forma.</h1>
           <p class="portada__bajada">Lo abrimos, lo miramos y lo dejamos andando. Afinamos lengüeta por lengüeta, arreglamos el fuelle y le damos nueva vida al estuche y a las correas. Traé cualquier marca y modelo.</p>
           <div class="portada__acciones">
-            <a class="boton boton--whatsapp" href="https://wa.me/NUMERO-A-CONFIRMAR" rel="noopener">Escribinos por WhatsApp</a>
+            <a class="boton boton--whatsapp" href="https://wa.me/NUMERO-A-CONFIRMAR" rel="noopener"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-whatsapp"/></svg>Escribinos por WhatsApp</a>
             <p class="portada__aviso etiqueta">Número de WhatsApp: A CONFIRMAR</p>
           </div>
         </div>
@@ -85,7 +100,7 @@
         </ul>
 
         <p class="servicios__cierre">¿No sabés qué le pasa a tu acordeón? Contanos qué notás y te orientamos.
-          <a class="enlace" href="https://wa.me/NUMERO-A-CONFIRMAR" rel="noopener">Escribinos por WhatsApp</a>
+          <a class="enlace" href="https://wa.me/NUMERO-A-CONFIRMAR" rel="noopener"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-whatsapp"/></svg>Escribinos por WhatsApp</a>
         </p>
       </div>
       <div class="regla" aria-hidden="true"></div>
@@ -211,7 +226,53 @@
       </div>
       <div class="regla" aria-hidden="true"></div>
     </section>
+
+    <section class="contacto" id="contacto" aria-labelledby="contacto-titulo">
+      <div class="contenedor">
+        <header class="seccion__cabeza">
+          <p class="etiqueta">Contacto</p>
+          <h2 id="contacto-titulo">Contanos qué le pasa a tu acordeón.</h2>
+          <p class="seccion__bajada">Lo más rápido es escribirnos por WhatsApp. Te respondemos y coordinamos para que lo traigas a verlo.</p>
+        </header>
+
+        <div class="contacto__grilla">
+          <div class="contacto__accion">
+            <a class="boton boton--whatsapp" href="https://wa.me/NUMERO-A-CONFIRMAR?text=Hola%2C%20quer%C3%ADa%20consultar%20por%20mi%20acorde%C3%B3n." rel="noopener"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-whatsapp"/></svg>Escribinos por WhatsApp</a>
+            <p class="etiqueta">Número de WhatsApp: A CONFIRMAR</p>
+
+            <h3 class="contacto__subtitulo">Para ayudarte mejor, contanos:</h3>
+            <ul class="contacto__consejos">
+              <li>La marca y el modelo, si los sabés.</li>
+              <li>Qué le notás: qué no suena, qué se traba o qué pierde aire.</li>
+              <li>Una foto del acordeón, si podés.</li>
+            </ul>
+          </div>
+
+          <dl class="datos datos--ficha">
+            <div>
+              <dt class="etiqueta"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-whatsapp"/></svg>WhatsApp</dt>
+              <dd>A CONFIRMAR</dd>
+            </div>
+            <div>
+              <dt class="etiqueta"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-ubicacion"/></svg>Dirección</dt>
+              <dd>A CONFIRMAR</dd>
+            </div>
+            <div>
+              <dt class="etiqueta"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-reloj"/></svg>Horarios</dt>
+              <dd>A CONFIRMAR</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </section>
   </main>
+
+  <footer class="pie">
+    <div class="contenedor pie__fila">
+      <p class="pie__nombre">Taller de acordeones · Nombre A CONFIRMAR</p>
+      <p class="etiqueta"><a href="#inicio">Volver arriba</a></p>
+    </div>
+  </footer>
 
   <script src="js/main.js" defer></script>
 </body>
