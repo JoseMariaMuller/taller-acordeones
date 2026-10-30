@@ -1,0 +1,360 @@
+/* Taller de acordeones — hoja de estilos
+   Paleta: papel kraft, tinta nogal, cuero, latón y un único acento (rojo laca). */
+
+@font-face {
+  font-family: "Fraunces";
+  src: url("../assets/fonts/fraunces.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Source Sans 3";
+  src: url("../assets/fonts/source-sans-3.woff2") format("woff2");
+  font-weight: 200 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("../assets/fonts/plex-mono-500.woff2") format("woff2");
+  font-weight: 500;
+  font-display: swap;
+}
+
+:root {
+  --papel: #EFE6D2;
+  --papel-2: #E2D5B8;
+  --tinta: #2B2118;
+  --cuero: #8A5A2B;
+  --laton: #B58A3C;
+  --laca: #A32A22;
+  --laca-oscuro: #7f1f19;
+
+  --f-titulo: "Fraunces", Georgia, "Times New Roman", serif;
+  --f-texto: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-etiqueta: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --ancho: 72rem;
+  --margen: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  /* La cabecera es fija: las anclas y el foco por teclado no deben quedar tapados */
+  scroll-padding-top: calc(var(--alto-cabecera, 5rem) + .75rem);
+}
+
+body {
+  margin: 0;
+  background-color: var(--papel);
+  /* Grano de papel: sólo CSS, sin imágenes */
+  background-image:
+    radial-gradient(rgba(43, 33, 24, .045) 1px, transparent 1px),
+    radial-gradient(rgba(138, 90, 43, .035) 1px, transparent 1px);
+  background-size: 7px 7px, 11px 11px;
+  background-position: 0 0, 3px 5px;
+  color: var(--tinta);
+  font-family: var(--f-texto);
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+
+a { color: inherit; }
+
+:focus-visible {
+  outline: 3px solid var(--laca);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.contenedor {
+  width: min(100% - 2 * var(--margen), var(--ancho));
+  margin-inline: auto;
+}
+
+.salto {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  background: var(--tinta);
+  color: var(--papel);
+  padding: .6rem 1rem;
+  z-index: 20;
+  text-decoration: none;
+}
+.salto:focus { top: 1rem; }
+
+/* Etiquetas tipo chapa de taller */
+.etiqueta {
+  font-family: var(--f-etiqueta);
+  font-weight: 500;
+  font-size: .78rem;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--cuero);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ───────── Cabecera ───────── */
+.cabecera {
+  border-bottom: 2px solid var(--tinta);
+  background: var(--papel);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.cabecera__fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem 1rem;
+  padding-block: .65rem;
+}
+.marca {
+  display: grid;
+  text-decoration: none;
+  line-height: 1.15;
+}
+.marca__etiqueta {
+  font-family: var(--f-etiqueta);
+  font-weight: 500;
+  font-size: .72rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--cuero);
+}
+.marca__nombre {
+  font-family: var(--f-titulo);
+  font-weight: 600;
+  font-size: clamp(1.05rem, 4.6vw, 1.3rem);
+}
+
+/* Menú: en celular es un panel que se abre con la hamburguesa */
+.hamburguesa {
+  display: inline-flex;
+  align-items: center;
+  gap: .7rem;
+  padding: .55rem .8rem;
+  background: transparent;
+  color: var(--tinta);
+  border: 2px solid var(--tinta);
+  border-radius: 3px;
+  font-family: var(--f-etiqueta);
+  font-weight: 500;
+  font-size: .8rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.hamburguesa__rayas,
+.hamburguesa__rayas::before,
+.hamburguesa__rayas::after {
+  display: block;
+  width: 1.3rem;
+  height: 2px;
+  background: var(--tinta);
+  transition: transform .2s, background-color .2s;
+}
+.hamburguesa__rayas { position: relative; }
+.hamburguesa__rayas::before,
+.hamburguesa__rayas::after { content: ""; position: absolute; left: 0; }
+.hamburguesa__rayas::before { top: -6px; }
+.hamburguesa__rayas::after { top: 6px; }
+.hamburguesa[aria-expanded="true"] .hamburguesa__rayas { background: transparent; }
+.hamburguesa[aria-expanded="true"] .hamburguesa__rayas::before { transform: translateY(6px) rotate(45deg); }
+.hamburguesa[aria-expanded="true"] .hamburguesa__rayas::after { transform: translateY(-6px) rotate(-45deg); }
+
+/* En celular el panel flota bajo la cabecera, sin empujar el contenido */
+.menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: calc(100vh - var(--alto-cabecera, 5rem));
+  max-height: calc(100dvh - var(--alto-cabecera, 5rem));
+  overflow-y: auto;
+  padding-inline: var(--margen);
+  background: var(--papel);
+  border-bottom: 2px solid var(--tinta);
+  box-shadow: 0 10px 18px -12px rgba(43, 33, 24, .5);
+}
+@media (max-width: 61.99rem) { .menu--cerrado { display: none; } }
+.menu__lista {
+  display: grid;
+  list-style: none;
+  margin: 0;
+  padding: .25rem 0 .5rem;
+}
+.menu__lista li + li { border-top: 1px dashed var(--cuero); }
+.menu a {
+  display: block;
+  padding: .85rem 0;
+  font-family: var(--f-etiqueta);
+  font-weight: 500;
+  font-size: .8rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+}
+.menu a:hover,
+.menu a[aria-current="location"] { border-bottom-color: var(--laca); }
+
+/* ───────── Portada ───────── */
+.portada { padding-top: clamp(2rem, 5vw, 4rem); }
+.portada__grilla {
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+}
+.portada__texto > .etiqueta { margin-bottom: 1rem; }
+
+h1 {
+  font-family: var(--f-titulo);
+  font-weight: 600;
+  font-size: clamp(2.5rem, 7vw, 4.6rem);
+  line-height: 1.03;
+  letter-spacing: -.012em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+}
+.portada__bajada {
+  font-size: 1.2rem;
+  max-width: 34rem;
+  margin: 0 0 1.75rem;
+}
+.portada__acciones { display: grid; gap: .75rem; justify-items: start; }
+.portada__aviso { color: var(--cuero); }
+
+.boton {
+  display: inline-block;
+  padding: .95rem 1.6rem;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 1.08rem;
+  text-decoration: none;
+  transition: background-color .15s, transform .15s;
+}
+.boton--whatsapp {
+  background: var(--laca);
+  color: #fff;
+  box-shadow: 0 3px 0 var(--laca-oscuro);
+}
+.boton--whatsapp:hover { background: var(--laca-oscuro); transform: translateY(1px); box-shadow: 0 2px 0 #5c1612; }
+
+.portada__figura { margin: 0; }
+.portada__figura img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  object-position: 63% 52%;
+}
+
+/* Regla de taller como divisor */
+.regla {
+  height: 22px;
+  margin-top: clamp(1.5rem, 4vw, 3rem);
+  border-top: 2px solid var(--tinta);
+  background-image:
+    repeating-linear-gradient(90deg, var(--tinta) 0 1px, transparent 1px 10px),
+    repeating-linear-gradient(90deg, var(--tinta) 0 1px, transparent 1px 50px);
+  background-size: 100% 8px, 100% 16px;
+  background-repeat: no-repeat;
+  background-position: 0 0, 0 0;
+  opacity: .55;
+}
+
+/* ───────── Secciones (base) ───────── */
+h2 {
+  font-family: var(--f-titulo);
+  font-weight: 600;
+  font-size: clamp(2rem, 5vw, 3.1rem);
+  line-height: 1.08;
+  letter-spacing: -.01em;
+  margin: 0 0 .9rem;
+  text-wrap: balance;
+}
+h3 {
+  font-family: var(--f-titulo);
+  font-weight: 600;
+  font-size: 1.55rem;
+  line-height: 1.15;
+  margin: 0 0 .7rem;
+}
+.seccion__cabeza { max-width: 40rem; margin-bottom: clamp(1.75rem, 4vw, 3rem); }
+.seccion__cabeza > .etiqueta { margin-bottom: .8rem; }
+.seccion__bajada { margin: 0; }
+
+.enlace {
+  font-weight: 700;
+  color: var(--laca);
+  text-underline-offset: .2em;
+  text-decoration-thickness: 2px;
+}
+.enlace:hover { color: var(--laca-oscuro); }
+
+/* ───────── Servicios ───────── */
+.servicios { padding-top: clamp(2.5rem, 6vw, 5rem); }
+.servicios__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1.25rem;
+}
+.servicio {
+  position: relative;
+  background: var(--papel-2);
+  border: 2px solid var(--tinta);
+  border-radius: 3px;
+  padding: 1.5rem 1.5rem 1.4rem;
+  box-shadow: 4px 4px 0 var(--tinta);
+}
+.servicio__numero {
+  display: inline-block;
+  font-family: var(--f-etiqueta);
+  font-weight: 500;
+  font-size: .85rem;
+  letter-spacing: .12em;
+  color: var(--papel);
+  background: var(--cuero);
+  padding: .15rem .55rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+.servicio { display: flex; flex-direction: column; align-items: flex-start; }
+.servicio p { margin: 0 0 1rem; }
+.servicios__cierre {
+  margin: clamp(1.75rem, 4vw, 2.5rem) 0 0;
+  max-width: 40rem;
+}
+
+/* ───────── Escritorio ───────── */
+@media (min-width: 62rem) {
+  .servicios__lista { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.75rem; }
+  .hamburguesa { display: none; }
+  .menu { position: static; max-height: none; overflow: visible; padding-inline: 0; border-bottom: 0; box-shadow: none; }
+  .menu__lista { display: flex; gap: 1.4rem; padding: 0; }
+  .menu__lista li + li { border-top: 0; }
+  .menu a { display: inline-block; padding: .35rem 0; }
+  .portada__grilla {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 3rem;
+  }
+  .portada__figura img {
+    aspect-ratio: 900 / 540;
+    object-position: 50% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}

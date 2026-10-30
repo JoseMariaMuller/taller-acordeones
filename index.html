@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Taller de acordeones · Reparación, afinación y estuches</title>
+  <meta name="description" content="Taller artesanal que repara y afina acordeones de cualquier marca y modelo, y reacondiciona estuches y correas. Escribinos por WhatsApp.">
+  <meta name="theme-color" content="#EFE6D2">
+  <link rel="preload" href="assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/source-sans-3.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="salto" href="#inicio">Ir al contenido</a>
+
+  <header class="cabecera">
+    <div class="contenedor cabecera__fila">
+      <a class="marca" href="#inicio" aria-label="Taller de acordeones, ir al inicio">
+        <span class="marca__etiqueta">Taller de acordeones</span>
+        <span class="marca__nombre">Nombre A CONFIRMAR</span>
+      </a>
+      <button class="hamburguesa" type="button" aria-expanded="false" aria-controls="menu-principal">
+        <span class="hamburguesa__texto">Menú</span>
+        <span class="hamburguesa__rayas" aria-hidden="true"></span>
+      </button>
+      <nav class="menu" id="menu-principal" aria-label="Principal">
+        <ul class="menu__lista">
+          <li><a href="#inicio" aria-current="location">Inicio</a></li>
+          <li><a href="#servicios">Servicios</a></li>
+          <li><a href="#galeria">Galería</a></li>
+          <li><a href="#taller">Sobre el taller</a></li>
+          <li><a href="#contacto">Contacto</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="portada" id="inicio" aria-labelledby="portada-titulo">
+      <div class="contenedor portada__grilla">
+        <div class="portada__texto">
+          <p class="etiqueta">Reparación · Afinación · Estuches y correas</p>
+          <h1 id="portada-titulo">Tu acordeón, de vuelta en forma.</h1>
+          <p class="portada__bajada">Lo abrimos, lo miramos y lo dejamos andando. Afinamos lengüeta por lengüeta, arreglamos el fuelle y le damos nueva vida al estuche y a las correas. Traé cualquier marca y modelo.</p>
+          <div class="portada__acciones">
+            <a class="boton boton--whatsapp" href="https://wa.me/NUMERO-A-CONFIRMAR" rel="noopener">Escribinos por WhatsApp</a>
+            <p class="portada__aviso etiqueta">Número de WhatsApp: A CONFIRMAR</p>
+          </div>
+        </div>
+
+        <figure class="portada__figura">
+          <img
+            src="assets/svg/acordeon.svg"
+            width="900" height="600"
+            alt="Ilustración de un acordeón a teclas sobre el banco de un taller, junto a su estuche abierto, un par de correas y las herramientas de afinación: una placa de lengüetas con una lengüeta resaltada, un afinador y una lima.">
+        </figure>
+      </div>
+      <div class="regla" aria-hidden="true"></div>
+    </section>
+
+    <section class="servicios" id="servicios" aria-labelledby="servicios-titulo">
+      <div class="contenedor">
+        <header class="seccion__cabeza">
+          <p class="etiqueta">Lo que hacemos en el taller</p>
+          <h2 id="servicios-titulo">Tres trabajos, bien hechos.</h2>
+          <p class="seccion__bajada">Cualquier marca y modelo. Si no ves tu caso acá, escribinos y lo charlamos.</p>
+        </header>
+
+        <ol class="servicios__lista">
+          <li class="servicio">
+            <span class="servicio__numero" aria-hidden="true">01</span>
+            <h3>Reparación</h3>
+            <p>Abrimos el acordeón, revisamos pieza por pieza y arreglamos lo que haga falta: el fuelle que pierde aire, las lengüetas que no suenan, las teclas o los botones que se traban.</p>
+          </li>
+          <li class="servicio">
+            <span class="servicio__numero" aria-hidden="true">02</span>
+            <h3>Afinación</h3>
+            <p>Afinamos lengüeta por lengüeta para que el instrumento suene parejo y justo. Es el trabajo fino del taller, hecho a mano y con paciencia.</p>
+          </li>
+          <li class="servicio">
+            <span class="servicio__numero" aria-hidden="true">03</span>
+            <h3>Estuches y correas</h3>
+            <p>Le damos nueva vida al estuche y a las correas, y también a otros accesorios, para que el acordeón viaje protegido y se lleve cómodo.</p>
+          </li>
+        </ol>
+
+        <p class="servicios__cierre">¿No sabés qué le pasa a tu acordeón? Contanos qué notás y te orientamos.
+          <a class="enlace" href="https://wa.me/NUMERO-A-CONFIRMAR" rel="noopener">Escribinos por WhatsApp</a>
+        </p>
+      </div>
+      <div class="regla" aria-hidden="true"></div>
+    </section>
+  </main>
+
+  <script src="js/main.js" defer></script>
+</body>
+</html>
