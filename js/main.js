@@ -113,6 +113,8 @@ if (cabecera) {
 (() => {
   const img = document.querySelector('.portada__figura img');
   if (!img || !window.fetch || !window.DOMParser) return;
+  // Abierto con doble clic (file://) el navegador no deja leer el SVG: queda la imagen común.
+  if (window.location.protocol === 'file:') return;
 
   const reducido = window.matchMedia('(prefers-reduced-motion: reduce)');
   const escritorio = window.matchMedia('(min-width: 62rem)');
@@ -135,28 +137,77 @@ if (cabecera) {
       encuadrar();
       escritorio.addEventListener('change', encuadrar);
 
-      // Recorre los tres servicios: fuelle, afinación y estuche. Dura menos de 5 s y no se repite sola.
+      // Recorre los tres servicios (fuelle, afinación y estuche) y se repite con una pausa en el medio.
+      // Como se mueve sola por más de 5 s, lleva un botón para pausarla (WCAG 2.2.2).
+      // Se detiene sola si el dibujo sale de pantalla o si cambiás de pestaña.
       const modos = ['fuelle', 'afinacion', 'estuche'];
       let corriendo = false;
-      const recorrer = () => {
+      let pausadaPorLaPersona = false;
+      let enPantalla = true;
+      let temporizador;
+
+      const puedeCorrer = () => !pausadaPorLaPersona && enPantalla && !document.hidden && !reducido.matches;
+
+      const detener = () => {
+        clearTimeout(temporizador);
+        delete svg.dataset.mode;
+        corriendo = false;
+      };
+
+      const recorrer = (repetir) => {
         if (corriendo || reducido.matches) return;
         corriendo = true;
         let indice = 0;
         const siguiente = () => {
           if (indice < modos.length) {
             svg.dataset.mode = modos[indice++];
-            setTimeout(siguiente, 1300);
-          } else {
-            delete svg.dataset.mode;
-            setTimeout(() => { corriendo = false; }, 900);
+            temporizador = setTimeout(siguiente, 1300);
+            return;
           }
+          delete svg.dataset.mode;
+          temporizador = setTimeout(() => {
+            corriendo = false;
+            if (puedeCorrer()) recorrer(true);
+          }, repetir ? 3500 : 900);
         };
         siguiente();
       };
 
-      setTimeout(recorrer, 1100);
-      caja.addEventListener('pointerenter', recorrer);
-      caja.addEventListener('click', recorrer);
+      const arrancar = () => {
+        if (puedeCorrer() && !corriendo) recorrer(true);
+      };
+
+      new IntersectionObserver((entradas) => {
+        enPantalla = entradas[0].isIntersecting;
+        if (enPantalla) arrancar();
+        else detener();
+      }, { threshold: 0.2 }).observe(caja);
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) detener();
+        else arrancar();
+      });
+
+      // Con la animación pausada, un clic sobre el dibujo la reproduce una vez.
+      caja.addEventListener('click', () => {
+        if (pausadaPorLaPersona && !corriendo) recorrer(false);
+      });
+
+      if (!reducido.matches) {
+        const pausa = document.createElement('button');
+        pausa.type = 'button';
+        pausa.className = 'dibujo__pausa';
+        pausa.textContent = 'Pausar animación';
+        pausa.addEventListener('click', () => {
+          pausadaPorLaPersona = !pausadaPorLaPersona;
+          pausa.textContent = pausadaPorLaPersona ? 'Reanudar animación' : 'Pausar animación';
+          if (pausadaPorLaPersona) detener();
+          else arrancar();
+        });
+        caja.after(pausa);
+      }
+
+      setTimeout(arrancar, 1100);
     })
     .catch(() => {});
 })();
@@ -166,7 +217,7 @@ if (cabecera) {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
 
   const SELECTOR = '.seccion__cabeza, .servicio, .carrusel, .taller__texto, .taller__foto, .taller__subtitulo, .paso, .contacto__accion, .datos--ficha';
-  const objetivos = [...document.querySelectorAll(`${SELECTOR}, .regla`)];
+  const objetivos = [...document.querySelectorAll(SELECTOR)];
 
   // Escalonado corto entre hermanos del mismo grupo.
   objetivos.forEach((elemento) => {

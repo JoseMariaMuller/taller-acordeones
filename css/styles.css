@@ -69,7 +69,7 @@ img { max-width: 100%; height: auto; display: block; }
 a { color: inherit; }
 
 :focus-visible {
-  outline: 3px solid var(--laca);
+  outline: 3px solid var(--s-foco, var(--laca));
   outline-offset: 3px;
   border-radius: 2px;
 }
@@ -98,7 +98,7 @@ a { color: inherit; }
   font-size: .78rem;
   letter-spacing: .13em;
   text-transform: uppercase;
-  color: var(--cuero);
+  color: var(--s-etiqueta, var(--cuero));
   line-height: 1.5;
   margin: 0;
 }
@@ -273,17 +273,55 @@ h1 {
 }
 
 /* Regla de taller como divisor */
-.regla {
-  height: 22px;
+/* Fuelle: divisor entre bandas. Sus pliegues se abren y se cierran con el scroll, sólo con CSS
+   (animation-timeline). Si el navegador no lo soporta, o con "reducir movimiento", queda a medio abrir. */
+@property --abre { syntax: "<number>"; inherits: false; initial-value: .4; }
+@property --abre-pie { syntax: "<number>"; inherits: false; initial-value: 1; }
+
+.fuelle {
+  --paso: calc(28px + 40px * var(--abre));
+  --s-siguiente: var(--papel);
+  height: 28px;
   margin-top: clamp(1.5rem, 4vw, 3rem);
-  border-top: 2px solid var(--tinta);
-  background-image:
-    repeating-linear-gradient(90deg, var(--tinta) 0 1px, transparent 1px 10px),
-    repeating-linear-gradient(90deg, var(--tinta) 0 1px, transparent 1px 50px);
-  background-size: 100% 8px, 100% 16px;
-  background-repeat: no-repeat;
-  background-position: 0 0, 0 0;
-  opacity: .55;
+  background:
+    /* cantonera de latón sobre la cresta plana */
+    linear-gradient(90deg, transparent 34%, color-mix(in srgb, var(--laton) 80%, transparent) 34% 66%, transparent 66%) 0 3px / var(--paso) 3px repeat-x,
+    /* cara iluminada y cara en sombra de cada pliegue */
+    linear-gradient(90deg, var(--s-siguiente) 50%, color-mix(in srgb, var(--s-siguiente) 82%, #000) 50%) 0 0 / var(--paso) 75% repeat-x,
+    var(--s-siguiente);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 30' preserveAspectRatio='none'%3E%3Cpath d='M0 30V22C12 22 22 4 34 4H66C78 4 88 22 100 22V30Z'/%3E%3C/svg%3E") 0 0 / var(--paso) 100% repeat-x, linear-gradient(#000, #000) 0 100% / 100% 30% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 30' preserveAspectRatio='none'%3E%3Cpath d='M0 30V22C12 22 22 4 34 4H66C78 4 88 22 100 22V30Z'/%3E%3C/svg%3E") 0 0 / var(--paso) 100% repeat-x, linear-gradient(#000, #000) 0 100% / 100% 30% no-repeat;
+}
+.portada .fuelle { --s-siguiente: var(--tinta); }
+.servicios .fuelle { --s-siguiente: var(--papel); }
+.galeria .fuelle { --s-siguiente: var(--papel-2); }
+.taller .fuelle { --s-siguiente: var(--cuero-oscuro); }
+.contacto .fuelle { --s-siguiente: var(--tinta); }
+
+@keyframes fuelle-respira { 0%, 100% { --abre: .05; } 50% { --abre: 1; } }
+@keyframes fuelle-final { from { --abre: .05; } to { --abre: 1; } }
+@keyframes pie-despliega { from { --abre-pie: 0; } to { --abre-pie: 1; } }
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* Cada divisor se abre al cruzar el centro de la pantalla y se cierra al salir */
+    .fuelle:not(.fuelle--final) {
+      animation: fuelle-respira linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+    /* El del pie, y el pie mismo, se despliegan al acercarte al final de la página */
+    .fuelle--final {
+      animation: fuelle-final linear both;
+      animation-timeline: scroll(root);
+      animation-range: calc(100% - 90vh) 100%;
+    }
+    .pie__grilla {
+      animation: pie-despliega linear both;
+      animation-timeline: scroll(root);
+      animation-range: calc(100% - 90vh) 100%;
+    }
+  }
 }
 
 /* Iconos de línea (paleta en el HTML) */
@@ -321,11 +359,11 @@ h3 {
 
 .enlace {
   font-weight: 700;
-  color: var(--laca);
+  color: var(--s-enlace, var(--laca));
   text-underline-offset: .2em;
   text-decoration-thickness: 2px;
 }
-.enlace:hover { color: var(--laca-oscuro); }
+.enlace:hover { color: var(--s-enlace-hover, var(--laca-oscuro)); }
 
 /* ───────── Servicios ───────── */
 .servicios { padding-top: clamp(2.5rem, 6vw, 5rem); }
@@ -342,7 +380,7 @@ h3 {
   border: 2px solid var(--tinta);
   border-radius: 3px;
   padding: 1.5rem 1.5rem 1.4rem;
-  box-shadow: 4px 4px 0 var(--tinta);
+  box-shadow: 4px 4px 0 var(--s-sombra, var(--tinta));
 }
 /* Chapa con icono: marco de tinta, trazo oscuro y detalles en latón */
 .icono {
@@ -413,7 +451,7 @@ h3 {
   padding: .75rem 0;
   border-bottom: 1px dashed var(--cuero);
 }
-.datos dt { color: var(--cuero); }
+.datos dt { color: var(--s-etiqueta, var(--cuero)); }
 .datos dd { margin: 0; font-weight: 700; }
 
 .taller__subtitulo { margin: clamp(2rem, 5vw, 3.5rem) 0 1.25rem; }
@@ -446,7 +484,7 @@ h3 {
 }
 
 /* ───────── Contacto ───────── */
-.contacto { padding-top: clamp(2.5rem, 6vw, 5rem); padding-bottom: clamp(2.5rem, 6vw, 4.5rem); }
+.contacto { padding-top: clamp(2.5rem, 6vw, 5rem); }
 .contacto__grilla { display: grid; gap: 2rem; align-items: start; }
 .contacto__accion { display: grid; gap: .75rem; justify-items: start; }
 .contacto__subtitulo { font-size: 1.3rem; margin: 1.75rem 0 .25rem; }
@@ -464,11 +502,76 @@ h3 {
 }
 .datos--ficha > div:last-child { border-bottom: 0; }
 
+/* ───────── Bandas de color ─────────
+   Cada sección redefine sus variables (--s-*) y los componentes las toman de ahí. */
+:root { --cuero-oscuro: #6B4421; }
+
+/* Las fichas siempre son claras: vuelven a los colores de papel aunque la banda sea oscura */
+.servicio,
+.paso,
+.datos--ficha {
+  color: var(--tinta);
+  --s-etiqueta: var(--cuero-oscuro);
+  --s-enlace: var(--laca);
+}
+
+/* Servicios: nogal */
+.servicios {
+  --s-etiqueta: var(--laton);
+  --s-enlace: var(--laton);
+  --s-enlace-hover: #e0bf75;
+  --s-foco: var(--laton);
+  --s-sombra: var(--laton);
+  color: var(--papel);
+  padding-bottom: 0;
+  background-color: var(--tinta);
+  background-image:
+    radial-gradient(rgba(239, 230, 210, .05) 1px, transparent 1px),
+    radial-gradient(rgba(181, 138, 60, .07) 1px, transparent 1px);
+  background-size: 7px 7px, 11px 11px;
+  background-position: 0 0, 3px 5px;
+}
+
+/* Sobre el taller: kraft */
+.taller {
+  --s-etiqueta: var(--cuero-oscuro);
+  background-color: var(--papel-2);
+  background-image:
+    radial-gradient(rgba(43, 33, 24, .05) 1px, transparent 1px),
+    radial-gradient(rgba(138, 90, 43, .05) 1px, transparent 1px);
+  background-size: 7px 7px, 11px 11px;
+  background-position: 0 0, 3px 5px;
+}
+.taller .paso { background: var(--papel); }
+.taller .paso .icono { background: var(--papel-2); }
+.taller .trabajo__foto { background-color: var(--papel); }
+
+/* Contacto: cuero oscuro */
+.contacto {
+  --s-etiqueta: var(--papel-2);
+  --s-foco: var(--papel);
+  color: var(--papel);
+  background-color: var(--cuero-oscuro);
+  background-image:
+    radial-gradient(rgba(239, 230, 210, .05) 1px, transparent 1px),
+    radial-gradient(rgba(43, 33, 24, .12) 1px, transparent 1px);
+  background-size: 7px 7px, 11px 11px;
+  background-position: 0 0, 3px 5px;
+}
+.contacto__consejos li::marker { color: var(--papel-2); }
+/* El botón rojo se perdería sobre el marrón: se invierte */
+.contacto .boton--whatsapp {
+  background: var(--papel);
+  color: var(--tinta);
+  box-shadow: 0 3px 0 var(--tinta);
+}
+.contacto .boton--whatsapp:hover { background: var(--papel-2); box-shadow: 0 2px 0 var(--tinta); }
+.contacto .boton--whatsapp:active { box-shadow: 0 1px 0 var(--tinta); }
+
 /* ───────── Pie ───────── */
 .pie {
   background: var(--tinta);
   color: var(--papel);
-  border-top: 4px solid var(--laton);
 }
 .pie a { color: inherit; text-underline-offset: .2em; }
 .pie a:hover { color: var(--laton); }
@@ -617,6 +720,23 @@ h3 {
 .carrusel__estado { text-align: center; }
 
 /* ───────── Ilustración de la portada, ya dentro de la página ───────── */
+.dibujo__pausa {
+  display: block;
+  margin: .4rem 0 0 auto;
+  padding: .4rem .1rem;
+  background: none;
+  border: 0;
+  font-family: var(--f-etiqueta);
+  font-weight: 500;
+  font-size: .78rem;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--cuero);
+  text-decoration: underline;
+  text-underline-offset: .25em;
+  cursor: pointer;
+}
+.dibujo__pausa:hover { color: var(--laca); }
 .portada__figura .dibujo { width: 100%; aspect-ratio: 1 / 1; }
 .dibujo .iso-svg { width: 100%; height: 100%; overflow: hidden; }
 @media (min-width: 62rem) {
@@ -644,15 +764,10 @@ h3 {
   }
   @keyframes aparecer { from { opacity: 0; transform: translateY(18px); } }
 
-  /* La regla de taller se dibuja de izquierda a derecha */
-  .revela .regla:not(.visto) { clip-path: inset(0 100% 0 0); }
-  .revela .regla.visto { animation: dibujar 1.1s var(--ease-in-out) backwards; }
-  @keyframes dibujar { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
-
   /* Fichas: se alzan al pasar el mouse */
   .servicio { transition: transform .3s var(--ease-out), box-shadow .3s var(--ease-out); }
   @media (hover: hover) {
-    .servicio:hover { transform: translateY(-4px); box-shadow: 4px 8px 0 var(--tinta); }
+    .servicio:hover { transform: translateY(-4px); box-shadow: 4px 8px 0 var(--s-sombra, var(--tinta)); }
   }
 
   /* Iconos: cada uno hace su gesto al pasar el mouse por su ficha */
@@ -695,6 +810,14 @@ h3 {
 }
 
 .boton--whatsapp:active { transform: translateY(2px) scale(.98); box-shadow: 0 1px 0 #5c1612; }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* main.js fija --abre-pie (0 a 1) según qué tan cerca estás del final de la página */
+  .pie__grilla {
+    opacity: calc(.55 + .45 * var(--abre-pie, 1));
+    transform: translateY(calc((1 - var(--abre-pie, 1)) * 14px));
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
