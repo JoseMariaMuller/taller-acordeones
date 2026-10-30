@@ -317,18 +317,20 @@ h3 {
   padding: 1.5rem 1.5rem 1.4rem;
   box-shadow: 4px 4px 0 var(--tinta);
 }
-.servicio__numero {
-  display: inline-block;
-  font-family: var(--f-etiqueta);
-  font-weight: 500;
-  font-size: .85rem;
-  letter-spacing: .12em;
-  color: var(--papel);
-  background: var(--cuero);
-  padding: .15rem .55rem;
-  border-radius: 2px;
+/* Chapa con icono: marco de tinta, trazo oscuro y detalles en latón */
+.icono {
+  display: inline-grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
   margin-bottom: 1rem;
+  color: var(--tinta);
+  background: var(--papel);
+  border: 2px solid var(--tinta);
+  border-radius: 3px;
+  box-shadow: 3px 3px 0 var(--cuero);
 }
+.icono svg { width: 3.2rem; height: 3.2rem; }
 .servicio { display: flex; flex-direction: column; align-items: flex-start; }
 .servicio p { margin: 0 0 1rem; }
 .servicios__cierre {
@@ -374,8 +376,62 @@ h3 {
   .galeria__grilla { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
+/* ───────── Sobre el taller ───────── */
+.taller { padding-top: clamp(2.5rem, 6vw, 5rem); }
+.taller__grilla { display: grid; gap: 2rem; align-items: start; }
+.taller__texto p { margin: 0 0 1rem; max-width: 36rem; }
+.datos {
+  margin: 1.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+  max-width: 36rem;
+  border-top: 2px solid var(--tinta);
+}
+.datos > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: .25rem 1rem;
+  padding: .75rem 0;
+  border-bottom: 1px dashed var(--cuero);
+}
+.datos dt { color: var(--cuero); }
+.datos dd { margin: 0; font-weight: 700; }
+
+.taller__subtitulo { margin: clamp(2rem, 5vw, 3.5rem) 0 1.25rem; }
+.pasos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1.25rem;
+}
+.paso {
+  background: var(--papel-2);
+  border: 2px solid var(--tinta);
+  border-radius: 3px;
+  padding: 1.25rem 1.5rem;
+}
+.paso h4 {
+  font-family: var(--f-titulo);
+  font-weight: 600;
+  font-size: 1.3rem;
+  line-height: 1.2;
+  margin: 0 0 .5rem;
+}
+.paso p { margin: 0; }
+.paso .icono { margin-bottom: .8rem; }
+.taller__nota { margin-top: 1rem; }
+
+@media (min-width: 48rem) {
+  .pasos { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
 /* ───────── Escritorio ───────── */
 @media (min-width: 62rem) {
+  .taller__grilla { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 3rem; }
   .galeria__grilla { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.75rem; }
   .servicios__lista { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.75rem; }
   .hamburguesa { display: none; }
