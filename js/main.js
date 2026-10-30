@@ -107,3 +107,186 @@ if (cabecera) {
   window.addEventListener('resize', alScroll);
   marcar(calcular());
 })();
+
+// Ilustración de la portada: se trae el SVG a la página para poder animar sus piezas.
+// Si algo falla (por ejemplo, abrir el archivo sin servidor), queda la imagen común.
+(() => {
+  const img = document.querySelector('.portada__figura img');
+  if (!img || !window.fetch || !window.DOMParser) return;
+
+  const reducido = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const escritorio = window.matchMedia('(min-width: 62rem)');
+
+  fetch(img.currentSrc || img.src)
+    .then((respuesta) => (respuesta.ok ? respuesta.text() : Promise.reject(new Error('sin SVG'))))
+    .then((texto) => {
+      const documento = new DOMParser().parseFromString(texto, 'image/svg+xml');
+      if (documento.querySelector('parsererror') || documento.documentElement.nodeName !== 'svg') return;
+
+      const svg = document.importNode(documento.documentElement, true);
+      svg.setAttribute('aria-label', img.alt);
+      const caja = document.createElement('div');
+      caja.className = 'dibujo';
+      caja.append(svg);
+      img.replaceWith(caja);
+
+      // Mismo recorte que hacía object-fit: cover sobre la imagen.
+      const encuadrar = () => svg.setAttribute('viewBox', escritorio.matches ? '0 30 900 540' : '189 0 600 600');
+      encuadrar();
+      escritorio.addEventListener('change', encuadrar);
+
+      // Recorre los tres servicios: fuelle, afinación y estuche. Dura menos de 5 s y no se repite sola.
+      const modos = ['fuelle', 'afinacion', 'estuche'];
+      let corriendo = false;
+      const recorrer = () => {
+        if (corriendo || reducido.matches) return;
+        corriendo = true;
+        let indice = 0;
+        const siguiente = () => {
+          if (indice < modos.length) {
+            svg.dataset.mode = modos[indice++];
+            setTimeout(siguiente, 1300);
+          } else {
+            delete svg.dataset.mode;
+            setTimeout(() => { corriendo = false; }, 900);
+          }
+        };
+        siguiente();
+      };
+
+      setTimeout(recorrer, 1100);
+      caja.addEventListener('pointerenter', recorrer);
+      caja.addEventListener('click', recorrer);
+    })
+    .catch(() => {});
+})();
+
+// Aparición al scrollear. La lista de selectores es la misma que usa el CSS (.revela / .visto).
+(() => {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+
+  const SELECTOR = '.seccion__cabeza, .servicio, .carrusel, .taller__texto, .taller__foto, .taller__subtitulo, .paso, .contacto__accion, .datos--ficha';
+  const objetivos = [...document.querySelectorAll(`${SELECTOR}, .regla`)];
+
+  // Escalonado corto entre hermanos del mismo grupo.
+  objetivos.forEach((elemento) => {
+    const hermanos = [...elemento.parentElement.children].filter((otro) => otro.matches(SELECTOR));
+    const posicion = hermanos.indexOf(elemento);
+    if (posicion > 0) elemento.style.setProperty('--retraso', `${Math.min(posicion, 4) * 90}ms`);
+  });
+
+  document.documentElement.classList.add('revela');
+
+  const observador = new IntersectionObserver((entradas) => {
+    entradas.forEach((entrada) => {
+      if (!entrada.isIntersecting) return;
+      entrada.target.classList.add('visto');
+      observador.unobserve(entrada.target);
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+
+  objetivos.forEach((elemento) => observador.observe(elemento));
+})();
+
+// Carrusel de la galería. Sin JavaScript queda una tira que se desliza igual; los controles los agrega este código.
+(() => {
+  const raiz = document.querySelector('[data-carrusel]');
+  if (!raiz) return;
+  const pista = raiz.querySelector('.carrusel__pista');
+  const items = [...pista.children];
+  if (items.length < 2) return;
+
+  const reducido = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const icono = '<svg class="ico" aria-hidden="true" focusable="false"><use href="#i-flecha"/></svg>';
+
+  const controles = document.createElement('div');
+  controles.className = 'carrusel__controles';
+  controles.innerHTML = `
+    <button type="button" class="carrusel__flecha carrusel__flecha--ant" aria-label="Fotos anteriores">${icono}</button>
+    <div class="carrusel__centro">
+      <ul class="carrusel__puntos"></ul>
+      <p class="etiqueta carrusel__estado" aria-live="polite"></p>
+    </div>
+    <button type="button" class="carrusel__flecha carrusel__flecha--sig" aria-label="Fotos siguientes">${icono}</button>`;
+  raiz.append(controles);
+
+  const anterior = controles.querySelector('.carrusel__flecha--ant');
+  const siguiente = controles.querySelector('.carrusel__flecha--sig');
+  const puntos = controles.querySelector('.carrusel__puntos');
+  const estado = controles.querySelector('.carrusel__estado');
+
+  const porVista = () => Math.max(1, Math.round(pista.clientWidth / items[0].getBoundingClientRect().width));
+  const posicion = (indice) => items[indice].offsetLeft - items[0].offsetLeft;
+  const maximo = () => pista.scrollWidth - pista.clientWidth;
+  const primero = () => {
+    let mejor = 0;
+    items.forEach((_, indice) => {
+      if (Math.abs(posicion(indice) - pista.scrollLeft) < Math.abs(posicion(mejor) - pista.scrollLeft)) mejor = indice;
+    });
+    return mejor;
+  };
+
+  const irA = (indice) => {
+    const destino = Math.max(0, Math.min(indice, items.length - porVista()));
+    pista.scrollTo({ left: posicion(destino), behavior: reducido.matches ? 'auto' : 'smooth' });
+  };
+
+  let paginas = 0;
+  const armarPuntos = () => {
+    const cantidad = Math.ceil(items.length / porVista());
+    if (cantidad === paginas) return;
+    paginas = cantidad;
+    puntos.innerHTML = '';
+    for (let pagina = 0; pagina < cantidad; pagina += 1) {
+      const punto = document.createElement('li');
+      punto.innerHTML = `<button type="button" class="carrusel__punto" aria-label="Ir al grupo ${pagina + 1} de ${cantidad}"></button>`;
+      punto.firstElementChild.addEventListener('click', () => irA(pagina * porVista()));
+      puntos.append(punto);
+    }
+  };
+
+  const paginaActual = () => {
+    if (pista.scrollLeft >= maximo() - 2) return paginas - 1;
+    return Math.min(paginas - 1, Math.floor(primero() / porVista()));
+  };
+
+  const actualizar = () => {
+    armarPuntos();
+    anterior.disabled = pista.scrollLeft <= 2;
+    siguiente.disabled = pista.scrollLeft >= maximo() - 2;
+    const actual = paginaActual();
+    [...puntos.children].forEach((punto, pagina) => {
+      const boton = punto.firstElementChild;
+      if (pagina === actual) boton.setAttribute('aria-current', 'true');
+      else boton.removeAttribute('aria-current');
+    });
+  };
+
+  // El texto anunciado se actualiza cuando el deslizamiento se detiene, para no hablar de más.
+  let temporizador;
+  const anunciar = () => {
+    const desde = primero() + 1;
+    const hasta = Math.min(items.length, desde + porVista() - 1);
+    estado.textContent = desde === hasta ? `Foto ${desde} de ${items.length}` : `Fotos ${desde} a ${hasta} de ${items.length}`;
+  };
+
+  let pendiente = false;
+  pista.addEventListener('scroll', () => {
+    clearTimeout(temporizador);
+    temporizador = setTimeout(anunciar, 180);
+    if (pendiente) return;
+    pendiente = true;
+    requestAnimationFrame(() => { pendiente = false; actualizar(); });
+  }, { passive: true });
+  window.addEventListener('resize', () => { actualizar(); anunciar(); });
+
+  anterior.addEventListener('click', () => irA(primero() - porVista()));
+  siguiente.addEventListener('click', () => irA(primero() + porVista()));
+  pista.addEventListener('keydown', (evento) => {
+    if (evento.key === 'ArrowRight') { evento.preventDefault(); irA(primero() + 1); }
+    if (evento.key === 'ArrowLeft') { evento.preventDefault(); irA(primero() - 1); }
+  });
+
+  actualizar();
+  anunciar();
+})();

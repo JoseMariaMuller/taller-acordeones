@@ -33,6 +33,9 @@
   --f-texto: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-etiqueta: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
+  --ease-out: cubic-bezier(.23, 1, .32, 1);
+  --ease-in-out: cubic-bezier(.77, 0, .175, 1);
+
   --ancho: 72rem;
   --margen: clamp(1.25rem, 4vw, 2.5rem);
 }
@@ -202,10 +205,22 @@ a { color: inherit; }
   text-transform: uppercase;
   text-decoration: none;
   white-space: nowrap;
-  border-bottom: 2px solid transparent;
+  position: relative;
 }
-.menu a:hover,
-.menu a[aria-current="location"] { border-bottom-color: var(--laca); }
+.menu a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--laca);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .3s var(--ease-out);
+}
+.menu a:hover::after,
+.menu a[aria-current="location"]::after { transform: scaleX(1); }
 
 /* ───────── Portada ───────── */
 .portada { padding-top: clamp(2rem, 5vw, 4rem); }
@@ -352,13 +367,6 @@ h3 {
 
 /* ───────── Galería ───────── */
 .galeria { padding-top: clamp(2.5rem, 6vw, 5rem); }
-.galeria__grilla {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 1.5rem;
-}
 .trabajo { margin: 0; }
 /* Espacio para foto real: marco de taller con trama, claramente provisorio */
 .trabajo__foto {
@@ -383,10 +391,6 @@ h3 {
 }
 .trabajo figcaption { margin-top: .7rem; }
 .trabajo figcaption .etiqueta { display: block; margin-bottom: .15rem; }
-
-@media (min-width: 40rem) {
-  .galeria__grilla { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
 
 /* ───────── Sobre el taller ───────── */
 .taller { padding-top: clamp(2.5rem, 6vw, 5rem); }
@@ -521,7 +525,6 @@ h3 {
   .pie__grilla { grid-template-columns: minmax(0, 6fr) minmax(0, 3fr) minmax(0, 4fr); gap: 3rem; }
   .contacto__grilla { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 3rem; }
   .taller__grilla { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 3rem; }
-  .galeria__grilla { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.75rem; }
   .servicios__lista { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.75rem; }
   .hamburguesa { display: none; }
   .menu { position: static; max-height: none; overflow: visible; padding-inline: 0; border-bottom: 0; box-shadow: none; }
@@ -537,6 +540,161 @@ h3 {
     object-position: 50% 50%;
   }
 }
+
+/* ───────── Carrusel de la galería ───────── */
+.carrusel { --gap: 1.5rem; }
+.carrusel__pista {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 .75rem;
+  display: flex;
+  gap: var(--gap);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.carrusel__pista::-webkit-scrollbar { display: none; }
+.carrusel__pista > li { flex: 0 0 100%; min-width: 0; scroll-snap-align: start; }
+@media (min-width: 40rem) {
+  .carrusel__pista > li { flex-basis: calc((100% - var(--gap)) / 2); }
+}
+@media (min-width: 62rem) {
+  .carrusel { --gap: 1.75rem; }
+  .carrusel__pista > li { flex-basis: calc((100% - 2 * var(--gap)) / 3); }
+}
+.carrusel__controles {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.carrusel__flecha {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  padding: 0;
+  color: var(--tinta);
+  background: var(--papel);
+  border: 2px solid var(--tinta);
+  border-radius: 3px;
+  box-shadow: 3px 3px 0 var(--tinta);
+  cursor: pointer;
+  transition: transform .15s var(--ease-out), box-shadow .15s var(--ease-out), background-color .15s;
+}
+.carrusel__flecha .ico { width: 1.4rem; height: 1.4rem; }
+.carrusel__flecha--ant .ico { transform: scaleX(-1); }
+.carrusel__flecha:hover:not(:disabled) { background: var(--papel-2); }
+.carrusel__flecha:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--tinta); }
+.carrusel__flecha:disabled { opacity: .35; box-shadow: none; cursor: default; }
+.carrusel__centro { display: grid; justify-items: center; gap: .3rem; }
+.carrusel__puntos { list-style: none; margin: 0; padding: 0; display: flex; }
+.carrusel__punto {
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.carrusel__punto::before {
+  content: "";
+  width: .7rem;
+  height: .7rem;
+  border: 2px solid var(--tinta);
+  border-radius: 50%;
+  transition: background-color .2s, border-color .2s, transform .25s var(--ease-out);
+}
+.carrusel__punto[aria-current="true"]::before {
+  background: var(--laca);
+  border-color: var(--laca);
+  transform: scale(1.25);
+}
+.carrusel__estado { text-align: center; }
+
+/* ───────── Ilustración de la portada, ya dentro de la página ───────── */
+.portada__figura .dibujo { width: 100%; aspect-ratio: 1 / 1; }
+.dibujo .iso-svg { width: 100%; height: 100%; overflow: hidden; }
+@media (min-width: 62rem) {
+  .portada__figura .dibujo { aspect-ratio: 900 / 540; }
+}
+
+/* ───────── Movimiento ─────────
+   Todo vive dentro de no-preference: con "reducir movimiento" el sitio queda quieto y completo.
+   Sólo se animan transform, opacity y clip-path. */
+@media (prefers-reduced-motion: no-preference) {
+  /* Entrada de la portada (sólo CSS) */
+  .portada__texto > * { animation: entrar .7s var(--ease-out) both; }
+  .portada__texto > :nth-child(2) { animation-delay: .08s; }
+  .portada__texto > :nth-child(3) { animation-delay: .16s; }
+  .portada__texto > :nth-child(4) { animation-delay: .24s; }
+  .portada__figura { animation: entrar-figura .9s var(--ease-out) .15s both; }
+  @keyframes entrar { from { opacity: 0; transform: translateY(18px); } }
+  @keyframes entrar-figura { from { opacity: 0; transform: translateY(14px) scale(.985); } }
+
+  /* Aparición al scrollear: main.js pone .revela en <html> y .visto en cada elemento.
+     La lista de selectores es la misma que usa main.js. */
+  .revela :is(.seccion__cabeza, .servicio, .carrusel, .taller__texto, .taller__foto, .taller__subtitulo, .paso, .contacto__accion, .datos--ficha):not(.visto) { opacity: 0; }
+  .revela :is(.seccion__cabeza, .servicio, .carrusel, .taller__texto, .taller__foto, .taller__subtitulo, .paso, .contacto__accion, .datos--ficha).visto {
+    animation: aparecer .7s var(--ease-out) var(--retraso, 0ms) backwards;
+  }
+  @keyframes aparecer { from { opacity: 0; transform: translateY(18px); } }
+
+  /* La regla de taller se dibuja de izquierda a derecha */
+  .revela .regla:not(.visto) { clip-path: inset(0 100% 0 0); }
+  .revela .regla.visto { animation: dibujar 1.1s var(--ease-in-out) backwards; }
+  @keyframes dibujar { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+
+  /* Fichas: se alzan al pasar el mouse */
+  .servicio { transition: transform .3s var(--ease-out), box-shadow .3s var(--ease-out); }
+  @media (hover: hover) {
+    .servicio:hover { transform: translateY(-4px); box-shadow: 4px 8px 0 var(--tinta); }
+  }
+
+  /* Iconos: cada uno hace su gesto al pasar el mouse por su ficha */
+  .icono--llave { --mov: girar; }
+  .icono--diapason { --mov: vibrar; }
+  .icono--estuche { --mov: saltito; }
+  .icono--lupa { --mov: buscar; }
+  .icono--globo { --mov: pop; }
+  .icono--notas { --mov: rebote; }
+  @media (hover: hover) {
+    .servicio:hover .icono svg,
+    .paso:hover .icono svg { animation: var(--mov) .7s var(--ease-out); }
+  }
+  @keyframes girar { 40% { transform: rotate(-28deg); } }
+  @keyframes vibrar { 20% { transform: translateX(-2px); } 40% { transform: translateX(2px); } 60% { transform: translateX(-1.5px); } 80% { transform: translateX(1px); } }
+  @keyframes saltito { 40% { transform: translateY(-4px); } 70% { transform: translateY(1px); } }
+  @keyframes buscar { 30% { transform: translate(-3px, -2px) rotate(-8deg); } 65% { transform: translate(3px, 1px) rotate(6deg); } }
+  @keyframes pop { 45% { transform: scale(1.14); } }
+  @keyframes rebote { 30% { transform: translateY(-5px); } 55% { transform: translateY(0); } 75% { transform: translateY(-2px); } }
+
+  /* Ilustración: las piezas de cada servicio se tiñen de laca y se mueven, una por una */
+  /* Los materiales internos pisaban el teñido del grupo: se repite la paleta laca para ellos */
+  .dibujo .iso[data-mode="fuelle"] .svc-fuelle :is(.m-nogal, .m-fuelle, .m-ebano, .m-marfil, .m-laton, .m-cuero, .m-forro, .m-acero, .m-madera, .m-cera),
+  .dibujo .iso[data-mode="afinacion"] .svc-afinacion :is(.m-nogal, .m-fuelle, .m-ebano, .m-marfil, .m-laton, .m-cuero, .m-forro, .m-acero, .m-madera, .m-cera),
+  .dibujo .iso[data-mode="estuche"] .svc-estuche :is(.m-nogal, .m-fuelle, .m-ebano, .m-marfil, .m-laton, .m-cuero, .m-forro, .m-acero, .m-madera, .m-cera) {
+    --anatomy-paper: #b8453a; --anatomy-face: #c4513f; --anatomy-top: #e07a68;
+    --anatomy-shade-0: #8c2c24; --anatomy-shade-1: #9f352b; --anatomy-shade-2: #b3402f; --anatomy-shade-3: #c75243;
+    --anatomy-hi: #fbeee6; --anatomy-mid: #f1cdc0; --anatomy-lo: #dc9d8b; --anatomy-faint: #c06a58; --anatomy-dot: #fbeee6;
+  }
+  .dibujo .iso-svg path { transition: fill .5s var(--ease-out), stroke .5s var(--ease-out); }
+  .dibujo .iso[data-mode="fuelle"] [data-part^="pleat-"] { animation: ondular .9s var(--ease-in-out) both; }
+  .dibujo .iso[data-mode="fuelle"] [data-part="pleat-7"] { animation-delay: .12s; }
+  .dibujo .iso[data-mode="fuelle"] [data-part="pleat-8"] { animation-delay: .24s; }
+  .dibujo .iso[data-mode="afinacion"] [data-part="tongue"] { animation: vibrar-lengueta .9s ease-out both; }
+  .dibujo .iso[data-mode="estuche"] [data-part="case"],
+  .dibujo .iso[data-mode="estuche"] [data-part="loose-straps"] { animation: asentar .9s var(--ease-out) both; }
+  @keyframes ondular { 40% { transform: translateY(-3px); } }
+  @keyframes vibrar-lengueta { 15% { transform: translateY(-1.6px); } 30% { transform: translateY(1.6px); } 45% { transform: translateY(-1.1px); } 60% { transform: translateY(1px); } 75% { transform: translateY(-.5px); } }
+  @keyframes asentar { 40% { transform: translateY(-4px); } }
+}
+
+.boton--whatsapp:active { transform: translateY(2px) scale(.98); box-shadow: 0 1px 0 #5c1612; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
